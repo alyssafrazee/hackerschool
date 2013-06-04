@@ -1,7 +1,7 @@
 hackerschool
 ============
 
-I'll store the code I write at Hacker School (hackerschool.com) during summer 2013 in this repo.
+I'll store the code I write at Hacker School (https://www.hackerschool.com/) during summer 2013 in this repo.
 
 log of awesome HS things:
 
