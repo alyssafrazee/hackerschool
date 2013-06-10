@@ -9,4 +9,4 @@ log of awesome HS things:
 
 6/5/2013:  4 crypto challenges down!  Got a code review (it was totally awesome).  Went over some real analysis in the afternoon, for a change of pace.  All good times..
 
-6/10/2013:  5 crypto challenges completed!  In the challenge 6 vs. Alyssa matchup, however, Challenge 6 is ahead.  Not for long, though.  I hear the comeback train.  
+6/10/2013:  5 crypto challenges completed!  In the challenge 6 vs. Alyssa matchup, however, Challenge 6 is ahead.  Not for long, though.  I hear the comeback train.  sdf
