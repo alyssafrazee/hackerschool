@@ -1,14 +1,15 @@
 #!/usr/bin/python
 
 ### readlet counting script
-### UPDATED TO TRY TO WORK WITH DICTIONARIES as a device
+### using numpy arrays instead of dictionaries - see if they are faster, more efficient, and allow us to filter all at once.
 ### and also to merge (& maybe filter) all at once. YEAH BABY.
 
-import pdb
-pdb.set_trace()
+# add chromosome lengths
+chrlen = 249250621
+fnames = ["orbFrontalF1-small.bam", "toyfile.bam"]
 
 def countReadlets(fnames,outfname,chromosome):
-#    import numpy
+    import numpy as np
     import pysam
 
     dictlist = []
@@ -18,53 +19,39 @@ def countReadlets(fnames,outfname,chromosome):
         id_start_end = []
         for read in samfile.fetch(chromosome):
             id_start_end.append([read.qname, read.pos+1, read.aend])
-        rdict = {}
-        for rlet in id_start_end:
-            start = rlet[1]
-            end = rlet[2]
-            for i in range(start, end):
-                if i in rdict:
-                    rdict[i] += 1
-                else:
-                    rdict[i] = 1
-        dictlist.append(rdict)
+        
+        print "starting sample!"
+        print len(id_start_end)
+        
+        datarow = np.zeros((chrlen, len(fnames)))
+        for idx,rlet in enumerate(id_start_end):
+            print "starting readlet" + " " + str(idx)
+            for i in range(rlet[1], rlet[2]):
+                    datarow[i] += 1
+        
+        print "finished one sample!"
+        
+        if fnames.index(samp)==0:
+            datatable = datarow
+        else:
+            datatable = np.vstack((datatable, datarow))
+            
+    return datatable
 
-    g = open("messages.txt", 'w')
-    g.write("finished dictionary-ing\n")
-    f = open(outfname, 'w')
+#starr-seq
 
-    # to write out without filtering:
-    allpos = set(keys(d) for d in dictlist)
-    for pos in sorted(allpos):
-        f.write("%s\t" % pos)
-        for d in dictlist:
-            f.write("%s\t" % d.get(pos,0) )
-        f.write("\n")
-    f.close()
-
-    # to write out with filtering:
-    #allsamps = {k:[d.get(k,0) for d in dictlist] for k in {k for d in dictlist for k in d}}
-    #g.write("finished creating whole-study dictionary\n")
-    #filtered = {k:allsamps[k] for k in allsamps if numpy.median(allsamps[k])>5}
-    #g.write("finished filtering")
-
-    #for pos, nums in filtered.iteritems():
-    #    f.write("%s\t" % pos)
-    #    for num in nums:
-    #        if num==nums[-1]:
-    #            f.write("%s" % num)
-    #        else:
-    #            f.write("%s\t" % num)
-    #    f.write("\n")
 
 
 ### get arguments from command line
 ### use: python countReadlets.py --file myfile.bam --output outfile.txt --kmer 100 --chrom 22
-import argparse
-parser = argparse.ArgumentParser(description="get arguments from command line")
-parser.add_argument("--files", nargs = "+", help="bam files to count & filter")
-parser.add_argument("--output", help="output file to store results")
-parser.add_argument("--chrom", help="chromosome to parse")
-args = parser.parse_args()
+#import argparse
+#parser = argparse.ArgumentParser(description="get arguments from command line")
+#parser.add_argument("--files", nargs = "+", help="bam files to count & filter")
+#parser.add_argument("--output", help="output file to store results")
+#parser.add_argument("--chrom", help="chromosome to parse")
+#args = parser.parse_args()
 
-countReadlets(args.files,args.output,args.chrom)
+#countReadlets(args.files,args.output,args.chrom)
+
+
+# also try sparsearray data structure
