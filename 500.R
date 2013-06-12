@@ -39,7 +39,7 @@ setMethod("show", "card",
 
 
 # function to create a deck (of cards):
-makeDeck = function(){
+makeDeck = function(trump = NULL){
   deck = list() #list to hold the cards
   deck.df = expand.grid(c(4:10, "J", "Q", "K", "A"), c("spades", "clubs", "diamonds", "hearts"), stringsAsFactors = FALSE)
   names(deck.df) = c("number", "suit")
@@ -47,6 +47,17 @@ makeDeck = function(){
   for(i in 1:nrow(deck.df)){
     deck[[i]] = card(suit = deck.df$suit[i], number=deck.df$number[i])
   }
+  
+  if(!is.null(trump)){
+    if(trump=="hearts") trumpCardInds = c(34:40, 42:44, 30, 41, 45)
+    if(trump=="diamonds") trumpCardInds = c(23:29, 31:33, 41, 30, 45)
+    if(trump=="spades") trumpCardInds = c(1:7, 9:11, 19, 8, 45)
+    if(trump=="clubs") trumpCardInds = c(12:18, 20:22, 8, 19, 45)
+    nonTrumpInds = c(1:45)[-trumpCardInds]
+    for(i in trumpCardInds) trump(deck[[i]]) = TRUE
+    deck = deck[c(nonTrumpInds, trumpCardInds)]
+  }
+  
   return(deck)
 }
 
@@ -61,8 +72,8 @@ compare = function(c1, c2){
 }
 
 # now the sorting:
-sortHand = function(hand){
-  deck = makeDeck()
+sortHand = function(hand, trump=NULL){
+  deck = makeDeck(trump=trump)
   inds = sapply(hand, function(x) which(compare(deck, x)==TRUE))
   return(deck[sort(inds)])
 }
@@ -148,6 +159,24 @@ checkBid = function(bid, highBid){
   
   return(bid) 
 }
+
+
+
+# function to find a given card in a hand
+findCard = function(hand, cardname){
+  # cardname = string, such as "joker", "A hearts", etc.
+  # hand is a list of cards.
+  splitCard = strsplit(cardname, split=" ")[[1]]
+  if(length(splitCard) == 1){
+    myCard = card(suit="none", number="joker")
+  }else{
+    myCard = card(suit=splitCard[2], number=splitCard[1])
+  }
+  tf = compare(hand, myCard)
+  cardInd = which(tf==TRUE)
+  return(cardInd)
+}
+
 
 #############################
 ######## PLAY BALL!! ########
@@ -240,7 +269,47 @@ play500 = function(){
     }
   } # finish choosing hand
   
-  showHand(hands[[leadPlayer]])
+  ###################################
+  # sort and assign trump to each player's hand
+  for(phand in 1:4) hands[[phand]] = sortHand(hands[[phand]], trump=highBid[2])
+  
+  ###################################
+  # play the game :) 
+  
+  # we already have a lead player (leadPlayer = 1, 2, 3, or 4 depending on who won the bid)
+  for(trick in 1:10){
+    cardsPlayed = list() 
+    message(paste0("Player ", leadPlayer,": here is your hand. It's your lead!"))
+    showHand(sortHand(hands[[leadPlayer]], trump = highBid[2]))
+    ledCard = readline("what card would you like to play? ")
+    ledCardInd = findCard(hands[[leadPlayer]], ledCard)
+    # add card to the middle:
+    cardsPlayed = append(cardsPlayed, hands[[leadPlayer]][[ledCardInd]])
+    
+    # remove card from your hand:
+    hands[[leadPlayer]] = hands[[leadPlayer]][-ledCardInd]
+    
+    nextPlayers = c(leadPlayer+1, leadPlayer+2, leadPlayer+3)
+    nextPlayers = sapply(nextPlayers, function(x){
+      if(x > 4){return(x %% 4)}; return(x)
+    })
+    
+    for(player in nextPlayers){
+      message(paste0("Player ", player,": here is your hand. It's your turn!"))
+      showHand(sortHand(hands[[player]], trump = highBid[2]))
+      message(paste("led:", ledCard))
+      chosenCard = readline("what card would you like to play? ")
+      chosenCardInd = findCard(hands[[player]], chosenCard)
+      # add card to the middle:
+      cardsPlayed = append(cardsPlayed, hands[[player]][[chosenCardInd]])
+      
+      # remove card from your hand:
+      hands[[player]] = hands[[player]][-chosenCardInd]
+    }
+    
+    showHand(cardsPlayed)
+    
+  }  
   
 }
 
