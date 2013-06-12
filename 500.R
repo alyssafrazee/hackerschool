@@ -155,6 +155,7 @@ checkBid = function(bid, highBid){
 
 
 play500 = function(){
+  
   deck = makeDeck()
   
   # deal the cards:
@@ -162,7 +163,7 @@ play500 = function(){
   
   # have players bid:
   highBid = NULL
-  firstTwo = NULL
+  firstTwo = list()
   leadPlayer = 0
   for(i in 1:4){
     if(i==4) message("[dealer]")
@@ -185,7 +186,7 @@ play500 = function(){
       if(theBid[1]!="pass"){
         if(theBid[2]=="aspades") theBid[2] <- "spades"
       }
-      firstTwo[[i]] = theBid
+      firstTwo[[i]] <- theBid
     }
       
   } #end loop: finished bidding.
@@ -201,12 +202,44 @@ play500 = function(){
   message("and again, here is your hand:")
   showHand(hands[[leadPlayer]])
   message("of these 15 cards, enter the 10 you would like to keep.")
+  
+  # winning bidder picks his hand from dealt + kitty
   for(j in 1:10){
     cardname = strsplit(readline(paste0("card ",j,": ")),split=" ")[[1]]
-    hand[[leadPlayer]][j] = card
-  }
+    
+    # if the card is the joker:
+    if(length(cardname)==1){
+      if(cardname != "joker") stop("what card are you trying to enter?")
+      ### FIX LATER TO ALLOW PLAYER TO RE-ENTER
+      hands[[leadPlayer]][[j]] = card(suit = "none", number="joker", trump=TRUE )
+    }
+    
+    # if the card is not the joker:
+    if(length(cardname)>1){
+      # assign trump (dealing with low bower)
+      if(cardname[2] == highBid[2]){
+        isTrump = TRUE
+      }else if(cardname[1]=="J" & highBid[2]=="spades" & cardname[2]=="clubs"){
+        isTrump = TRUE
+      }else if(cardname[1]=="J" & highBid[2]=="clubs" & cardname[2]=="spades"){
+        isTrump = TRUE
+      }else if(cardname[1]=="J" & highBid[2]=="hearts" & cardname[2]=="diamonds"){
+        isTrump = TRUE
+      }else if(cardname[1]=="J" & highBid[2]=="diamonds" & cardname[2]=="hearts"){
+        isTrump = TRUE
+      }else{isTrump = FALSE}
+      
+      hands[[leadPlayer]][[j]] = card(suit = cardname[2], number=cardname[1], trump=isTrump ) 
+    }
+  } # finish choosing hand
+  
+  showHand(hands[[leadPlayer]])
   
 }
+
+
+
+
 
 
 
