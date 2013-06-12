@@ -31,9 +31,9 @@ setMethod("trump", "card", function(x) x@trump)
 # define the show method:
 setMethod("show", "card", 
           function(object){
-            if(number(object)=="joker") {cat("joker")
-            } else{ cat(paste(number(object), suit(object), "\n"))
-                  }
+            if(number(object)=="joker") {cat("joker [trump]\n")}
+            else if(trump(object)) {cat(paste(number(object), suit(object), "[trump]", "\n"))}
+            else {cat(paste(number(object), suit(object), "\n"))}
           }
 )
 
@@ -158,9 +158,11 @@ play500 = function(){
   
   deck = makeDeck()
   
+  ###################################
   # deal the cards:
   hands = deal(deck)
   
+  ###################################
   # have players bid:
   highBid = NULL
   firstTwo = list()
@@ -191,19 +193,24 @@ play500 = function(){
       
   } #end loop: finished bidding.
 
+  
+  ###################################
+  # determine the winning bid:
   if(is.null(highBid)) print("Everyone has passed: re-dealing.")
   if(highBid[1]=="6") print("House rules: play only conitnues if the highest bid is at least 7.  Re-dealing.")
   
   if(highBid[2]=="aspades") highBid[2] = "spades"
   message(paste0("Player ",leadPlayer," wins the bid with ",paste(highBid, collapse=" ")))
   
+  ###################################
+  # winning player gets the kitty
   message(paste0("Player ", leadPlayer,": the kitty is here:"))
   showHand(hands$kitty)
   message("and again, here is your hand:")
   showHand(hands[[leadPlayer]])
   message("of these 15 cards, enter the 10 you would like to keep.")
   
-  # winning bidder picks his hand from dealt + kitty
+  # (pick 10 cards)
   for(j in 1:10){
     cardname = strsplit(readline(paste0("card ",j,": ")),split=" ")[[1]]
     
@@ -236,9 +243,6 @@ play500 = function(){
   showHand(hands[[leadPlayer]])
   
 }
-
-
-
 
 
 
