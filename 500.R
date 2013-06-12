@@ -101,8 +101,8 @@ deal = function(deck){
   return(list(hand1=hand1, hand2=hand2, hand3=hand3, dealerhand=dealerhand, kitty=kitty))
 }
 
-deck = makeDeck()
-deal(deck)
+#deck = makeDeck()
+#deal(deck)
 
 
 
@@ -110,14 +110,15 @@ deal(deck)
 compareBids = function(bid1, bid2){
   # bid1/bid2 are length-2 vectors of strings (num + suit), except for that you can put in NULL for bid1 and "pass" for bid2
   # want to know if bid2 is higher than bid1
+  # relies on alphabetical order of "aspades", "clubs", "diamonds", "hearts", "notrump"
   if(is.null(bid1)) return(TRUE)
   if(length(bid2)==1){
     if(bid2=="pass"){
       return(TRUE)
     }
   }
-  if(bid2[1] > bid1[1]) return(TRUE)
-  if(bid2[1] < bid1[1]) return(FALSE)
+  if(as.numeric(bid2[1]) > as.numeric(bid1[1])) return(TRUE)
+  if(as.numeric(bid2[1]) < as.numeric(bid1[1])) return(FALSE)
   if(bid2[2] == bid1[2]) return(FALSE)
   if(bid2[2] < bid1[2]) return(FALSE)
   return(TRUE)
@@ -129,16 +130,17 @@ checkBid = function(bid, highBid){
   # if you bid something weird:
   if(length(bid)!=2){
     if(bid!="pass"){
-    theBid = strsplit(readline("invalid bid - try another bid: "), split=" ")[[1]]
-    if(theBid[1]!="pass"){
-      if(theBid[2]=="spades") theBid[2] = "aspades"
+      theBid = strsplit(readline("invalid bid - try another bid: "), split=" ")[[1]]
+      if(theBid[1]!="pass"){
+        if(theBid[2]=="spades") theBid[2] = "aspades"
+      }
+      return(checkBid(theBid, highBid))
     }
-    return(checkBid(theBid, highBid))
-    }
+    if(bid == "pass") return(bid)
   }
   
   # if you bid less than 6:
-  if(bid[1] < 6){
+  if(as.numeric(bid[1]) < 6){
     theBid = strsplit(readline("please bid at least 6: "), split=" ")[[1]]
     if(theBid[1]!="pass"){
       if(theBid[2]=="spades") theBid[2] = "aspades"
@@ -147,8 +149,8 @@ checkBid = function(bid, highBid){
   }
   
   # if you bid lower than the current highest bid:
-  # (NOTE THAT THIS SHOULD ONLY BE USED IN THE play500() FUNCTION)
   if(!compareBids(highBid, bid)){
+    if(highBid[2]=="aspades") highBid[2] = "spades"
     message(paste0("You must bid higher than the current high bid (",paste(highBid, collapse=" "),")"))
     theBid = strsplit(readline("new bid: "), split=" ")[[1]]
     if(theBid[1]!="pass"){
@@ -168,6 +170,7 @@ findCard = function(hand, cardname){
   # hand is a list of cards.
   splitCard = strsplit(cardname, split=" ")[[1]]
   if(length(splitCard) == 1){
+    if(splitCard != "joker") stop("invalid card name")
     myCard = card(suit="none", number="joker")
   }else{
     myCard = card(suit=splitCard[2], number=splitCard[1])
@@ -187,211 +190,331 @@ findCard = function(hand, cardname){
 
 play500 = function(){
   
-  deck = makeDeck()
-  
-  ###################################
-  # deal the cards:
-  hands = deal(deck)
-  
-  ###################################
-  # have players bid:
-  highBid = NULL
-  firstTwo = list()
-  leadPlayer = 0
-  for(i in 1:4){
-    if(i==4) message("[dealer]")
-    message(paste0("player ", i,": here is your hand." ))
-    showHand(hands[[i]])
-    if(i==4 | i==3) message(paste0("your partner has bid ", paste(firstTwo[[i-2]], collapse=" ")))
-    theBid = strsplit(readline("Please make your bid: "), split=" ")[[1]]
-    if(theBid[1]!="pass"){
-      if(theBid[2]=="spades") theBid[2] = "aspades"
-    }
-    theBid = checkBid(theBid, highBid)  # this will ALWAYS result in either a "pass" or a new high bid.
-    
-    if(length(theBid)>1){
-        highBid = theBid 
-        leadPlayer = i
-      }
-    
-    # for printing only:
-    if(i==2 | i==1){
-      if(theBid[1]!="pass"){
-        if(theBid[2]=="aspades") theBid[2] <- "spades"
-      }
-      firstTwo[[i]] <- theBid
-    }
-      
-  } #end loop: finished bidding.
-
-  
-  ###################################
-  # determine the winning bid:
-  if(is.null(highBid)) print("Everyone has passed: re-dealing.")
-  if(highBid[1]=="6") print("House rules: play only continues if the highest bid is at least 7.  Re-dealing.")
-  
-  if(highBid[2]=="aspades") highBid[2] = "spades"
-  message(paste0("Player ",leadPlayer," wins the bid with ",paste(highBid, collapse=" ")))
-  
-  ###################################
-  # winning player gets the kitty
-  message(paste0("Player ", leadPlayer,": the kitty is here:"))
-  showHand(hands$kitty)
-  message("and again, here is your hand:")
-  showHand(hands[[leadPlayer]])
-  message("of these 15 cards, enter the 10 you would like to keep.")
-  
-  # (pick 10 cards)
-  for(j in 1:10){
-    cardname = strsplit(readline(paste0("card ",j,": ")),split=" ")[[1]]
-    
-    # if the card is the joker:
-    if(length(cardname)==1){
-      if(cardname != "joker") stop("what card are you trying to enter?")
-      ### FIX LATER TO ALLOW PLAYER TO RE-ENTER
-      hands[[leadPlayer]][[j]] = card(suit = "none", number="joker", trump=TRUE )
-    }
-    
-    # if the card is not the joker:
-    if(length(cardname)>1){
-      # assign trump (dealing with low bower)
-      if(cardname[2] == highBid[2]){
-        isTrump = TRUE
-      }else if(cardname[1]=="J" & highBid[2]=="spades" & cardname[2]=="clubs"){
-        isTrump = TRUE
-      }else if(cardname[1]=="J" & highBid[2]=="clubs" & cardname[2]=="spades"){
-        isTrump = TRUE
-      }else if(cardname[1]=="J" & highBid[2]=="hearts" & cardname[2]=="diamonds"){
-        isTrump = TRUE
-      }else if(cardname[1]=="J" & highBid[2]=="diamonds" & cardname[2]=="hearts"){
-        isTrump = TRUE
-      }else{isTrump = FALSE}
-      
-      hands[[leadPlayer]][[j]] = card(suit = cardname[2], number=cardname[1], trump=isTrump ) 
-    }
-  } # finish choosing hand
-  
-  ###################################
-  # sort and assign trump to each player's hand
-  for(phand in 1:4) hands[[phand]] = sortHand(hands[[phand]], trump=highBid[2])
-  
-  ###################################
-  # keep score
   score13 = 0
   score24 = 0
-  numTricks13 = 0
-  numTricks24 = 0
   
-  ###################################
-  # play the game :) 
+  dealer = 4 # player 4 starts as the dealer.
   
-  # we already have a lead player (leadPlayer = 1, 2, 3, or 4 depending on who won the bid)
-  for(trick in 1:10){
-    cardsPlayed = list() 
-    message(paste0("Player ", leadPlayer,": here is your hand. It's your lead!"))
-    showHand(sortHand(hands[[leadPlayer]], trump = highBid[2]))
-    ledCard = readline("what card would you like to play? ")
-    ledCardInd = findCard(hands[[leadPlayer]], ledCard)
-    # add card to the middle:
-    cardsPlayed = append(cardsPlayed, hands[[leadPlayer]][[ledCardInd]])
-    
-    # remove card from your hand:
-    hands[[leadPlayer]] = hands[[leadPlayer]][-ledCardInd]
-    
-    # figure out which suit was led:
-    ledSuit = ifelse(trump(cardsPlayed[[1]]), highBid[2], suit(cardsPlayed[[1]]))
-    
-    # have the other players play, following suit.
-    nextPlayers = c(leadPlayer+1, leadPlayer+2, leadPlayer+3)
-    nextPlayers = sapply(nextPlayers, function(x){
+  # create the score table (just once, before the loop)
+  scoreTable = matrix(seq(140, 520, by=20), ncol=5, byrow=TRUE)
+  colnames(scoreTable) = c("spades", "clubs", "diamonds", "hearts", "notrump")
+  rownames(scoreTable) = c("7", "8", "9", "10")  
+  
+  while(score13<500 & score13>(-500) & score24<500 & score24>(-500)){
+    deck = makeDeck()
+  
+    ###################################
+    # deal the cards:
+    dealer = ifelse(dealer <= 4, dealer, dealer %% 4)
+    message(paste("Player",dealer,"is dealing."))
+    hands = deal(deck)
+  
+    ###################################
+    # have players bid:
+    highBid = NULL
+    firstTwo = list() # so that second-partner-bidders can be reminded
+    firstBidders = c(1:3)+dealer
+    firstBidders = sapply(firstBidders, function(x){
       if(x > 4){return(x %% 4)}; return(x)
     })
+    biddingOrder = c(firstBidders, dealer)
+    for(i in 1:4){
+      if(i==4) message("[dealer]")
+      message(paste0("player ", biddingOrder[i],": here is your hand." ))
+      showHand(hands[[i]])
+      if(i==4 | i==3) message(paste0("your partner has bid ", paste(firstTwo[[i-2]], collapse=" ")))
+      theBid = strsplit(readline("Please make your bid: "), split=" ")[[1]]
+      if(theBid[1]!="pass"){
+        if(theBid[2]=="spades") theBid[2] = "aspades"
+      }
+      theBid = checkBid(theBid, highBid)  # this will ALWAYS result in either a "pass" or a new high bid.
     
-    for(player in nextPlayers){
-      message(paste0("Player ", player,": here is your hand. It's your turn!"))
-      showHand(sortHand(hands[[player]], trump = highBid[2]))
-      message(paste("led:", ledCard))
-      if(length(cardsPlayed)>1){
-        for(cnum in 2:length(cardsPlayed)){
-          message(paste(number(cardsPlayed[[cnum]]), suit(cardsPlayed[[cnum]])))
-        }
+      if(length(theBid)>1){
+        highBid = theBid 
+        leadPlayer = biddingOrder[i]
       }
-      chosenCard = readline("what card would you like to play? ")
-      chosenCardInd = findCard(hands[[player]], chosenCard)
-      chosenCard.obj = hands[[player]][[chosenCardInd]]
+    
+      # for printing only:
+      if(i==2 | i==1){
+        if(theBid[1]!="pass"){
+          if(theBid[2]=="aspades") theBid[2] <- "spades"
+        }
+        firstTwo[[i]] <- theBid
+      }
       
-      # did the player have any of the suit that was led?
-      if(trump(cardsPlayed[[1]])){
-        # if trump was led:
-        howManyTrump = sum(sapply(hands[[player]], function(x) trump(x)))
-        while(!trump(chosenCard.obj) & howManyTrump!=0){
-          message(paste0("you must follow suit (suit led: ", ledSuit,")"))
-          chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
-          chosenCardInd = findCard(hands[[player]], chosenCard)
-          chosenCard.obj = hands[[player]][[chosenCardInd]]
+    } #end loop: finished bidding.
+    bidWinner = leadPlayer #(leadPlayer will change later)
+    print(bidWinner)
+
+  
+    ###################################
+    # determine the winning bid:
+    if(is.null(highBid)) print("Everyone has passed: re-dealing.")
+    if(highBid[1]=="6") print("House rules: play only continues if the highest bid is at least 7.  Re-dealing.")
+  
+    if(highBid[2]=="aspades") highBid[2] = "spades"
+    message(paste0("Player ",leadPlayer," wins the bid with ",paste(highBid, collapse=" ")))
+  
+    ###################################
+    # winning player gets the kitty
+    message(paste0("Player ", leadPlayer,": the kitty is here:"))
+    showHand(hands$kitty)
+    message("and again, here is your hand:")
+    showHand(hands[[biddingOrder[leadPlayer]]])
+    message("of these 15 cards, enter the 10 you would like to keep.")
+  
+    # (pick 10 cards)
+    j = 1
+    newHand = list() #create empty list, for his new hand
+    while(j <= 10){
+      cardname = strsplit(readline(paste0("card ",j,": ")),split=" ")[[1]]
+    
+      # if the card is the joker:
+      if(length(cardname)==1){
+        if(cardname != "joker"){
+          message("Invalid card - try again.") 
+          next
         }
-      }
-      if(!trump(cardsPlayed[[1]])){
-        # if off-suit was led:
-        howManyOfSuit = sum(sapply(hands[[player]], function(x) suit(x)==ledSuit))
-        while(suit(chosenCard.obj)!=ledSuit & howManyOfSuit!=0){
-          message(paste0("you must follow suit (suit led: ", ledSuit,")"))
-          chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
-          chosenCardInd = findCard(hands[[player]], chosenCard)
-          chosenCard.obj = hands[[player]][[chosenCardInd]]          
+        tryJoker = findCard(hands[[biddingOrder[leadPlayer]]], "joker")
+        if(length(tryJoker)==0){
+          tryJokerKitty = findCard(hands$kitty, "joker")
+            if(length(tryJokerKitty)==0){
+              message("the joker is not in your hand or the kitty - try again.")
+              next
+            }
         }
+        alreadyJokered = findCard(newHand, "joker")
+        if(length(alreadyJokered)!=0){
+          message("you already have the joker in your hand - try again.")
+          next
+        }
+        newHand[[j]] = card(suit = "none", number="joker", trump=TRUE )
       }
+    
+      # if the card is not the joker:
+      if(length(cardname)>1){
+        
+        # make sure it's in this player's hand:
+        tryCard = findCard(hands[[biddingOrder[leadPlayer]]], paste(cardname, collapse=" "))
+        if(length(tryCard)==0){
+          tryCardKitty = findCard(hands$kitty, paste(cardname, collapse=" "))
+          if(length(tryCardKitty)==0){
+            message("this card is not in your hand or the kitty - try again.")
+            next
+          }
+        }
+        
+        # make sure he didn't already pick it:
+        cardAlready = findCard(newHand, paste(cardname, collapse=" "))
+        if(length(cardAlready)!=0){
+          message("you already have this card in your hand - try again.")
+          next
+        }
+        
+        # assuming they've picked a valid card, assign trump (deal w/ low bower)
+        if(cardname[2] == highBid[2]){
+          isTrump = TRUE
+        }else if(cardname[1]=="J" & highBid[2]=="spades" & cardname[2]=="clubs"){
+          isTrump = TRUE
+        }else if(cardname[1]=="J" & highBid[2]=="clubs" & cardname[2]=="spades"){
+          isTrump = TRUE
+        }else if(cardname[1]=="J" & highBid[2]=="hearts" & cardname[2]=="diamonds"){
+          isTrump = TRUE
+        }else if(cardname[1]=="J" & highBid[2]=="diamonds" & cardname[2]=="hearts"){
+          isTrump = TRUE
+        }else{isTrump = FALSE}
+      
+        newHand[[j]] = card(suit = cardname[2], number=cardname[1], trump=isTrump ) 
+      }
+      
+      j = j+1
+      
+    } # finish choosing hand
+    hands[[biddingOrder[leadPlayer]]] = newHand
+  
+    ###################################
+    # sort and assign trump to each player's hand
+    for(phand in 1:4) hands[[phand]] = sortHand(hands[[phand]], trump=highBid[2])
+  
+    ###################################
+    # keep track of who takes which tricks
+    numTricks13 = 0
+    numTricks24 = 0
+  
+    ###################################
+    # play the game :) 
+  
+    # we already have a lead player (leadPlayer = 1, 2, 3, or 4 depending on who won the bid)
+    for(trick in 1:10){
+      cardsPlayed = list() 
+      message(paste0("Player ", leadPlayer,": here is your hand. It's your lead!"))
+      showHand(sortHand(hands[[biddingOrder[leadPlayer]]], trump = highBid[2]))
+      ledCard = readline("what card would you like to play? ")
+      ledCardInd = findCard(hands[[biddingOrder[leadPlayer]]], ledCard)
+      while(length(ledCardInd)==0){
+        ledCard = readline("this card is not in your hand - choose another: ")
+        ledCardInd = findCard(hands[[biddingOrder[leadPlayer]]], ledCard)
+        }
       
       # add card to the middle:
-      cardsPlayed = append(cardsPlayed, chosenCard.obj)
-      
+      cardsPlayed = append(cardsPlayed, hands[[biddingOrder[leadPlayer]]][[ledCardInd]])
+    
       # remove card from your hand:
-      hands[[player]] = hands[[player]][-chosenCardInd]
+      hands[[biddingOrder[leadPlayer]]] = hands[[biddingOrder[leadPlayer]]][-ledCardInd]
+    
+      # figure out which suit was led:
+      ledSuit = ifelse(trump(cardsPlayed[[1]]), highBid[2], suit(cardsPlayed[[1]]))
+    
+      # have the other players play, following suit.
+      nextPlayers = c(1:3)+leadPlayer
+      nextPlayers = sapply(nextPlayers, function(x){
+        if(x > 4){return(x %% 4)}; return(x)
+      })
+    
+      for(player in nextPlayers){
+        message(paste0("Player ", player,": here is your hand. It's your turn!"))
+        showHand(sortHand(hands[[biddingOrder[player]]], trump = highBid[2]))
+        message(paste("led:", ledCard))
+        
+        if(length(cardsPlayed)>1){
+          for(cnum in 2:length(cardsPlayed)){
+            if(number(cardsPlayed[[cnum]])=="joker"){
+              message("joker")
+            }else{
+            message(paste(number(cardsPlayed[[cnum]]), suit(cardsPlayed[[cnum]])))
+          }# end if/else
+         }# end for loop
+        }# end if(length(cardsPlayed)>1)
+        
+        chosenCard = readline("what card would you like to play? ")
+        chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+        while(length(chosenCardInd)==0){
+          chosenCard = readline("this card is not in your hand - choose another: ")
+          chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+        }
+        chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]
+      
+        # did the player have any of the suit that was led?
+        if(trump(cardsPlayed[[1]])){
+          # if trump was led:
+          howManyTrump = sum(sapply(hands[[biddingOrder[player]]], function(x) trump(x)))
+          while(!trump(chosenCard.obj) & howManyTrump!=0){
+            message(paste0("you must follow suit (suit led: ", ledSuit,")"))
+            chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
+            chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+            chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]
+          }
+        }
+        if(!trump(cardsPlayed[[1]])){
+          # if off-suit was led:
+          howManyOfSuit = sum(sapply(hands[[biddingOrder[player]]], function(x) suit(x)==ledSuit))
+          while(suit(chosenCard.obj)!=ledSuit & howManyOfSuit!=0){
+            message(paste0("you must follow suit (suit led: ", ledSuit,")"))
+            chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
+            chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+            chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]          
+          }
+        }
+      
+        # add card to the middle:
+        cardsPlayed = append(cardsPlayed, chosenCard.obj)
+      
+        # remove card from your hand:
+        hands[[biddingOrder[player]]] = hands[[biddingOrder[player]]][-chosenCardInd]
+      } # all players are done playing
+    
+      showHand(cardsPlayed)
+    
+      # figure out which card wins:
+      playerList = c(leadPlayer, nextPlayers)
+      trumpDeck = makeDeck(trump = highBid[2])
+      trumpBool = sapply(cardsPlayed, function(x) trump(x))
+      anyTrump = sum(trumpBool)
+    
+      if(anyTrump > 0){
+        trumpInds = which(trumpBool)
+        deckRank = sapply(trumpInds, function(x) findCard(trumpDeck, paste(number(cardsPlayed[[x]]), suit(cardsPlayed[[x]]))))
+        winInd = trumpInds[which.max(deckRank)]
+      }
+    
+      if(anyTrump == 0){
+        followSuitInds = which(sapply(cardsPlayed, function(x) suit(x)==ledSuit))
+        deckRank = sapply(followSuitInds, function(x) findCard(trumpDeck, paste(number(cardsPlayed[[x]]), suit(cardsPlayed[[x]]))))
+        winInd = followSuitInds[which.max(deckRank)]
+      }
+    
+      winningPlayer = playerList[winInd]
+      winningCard = paste(number(cardsPlayed[[winInd]]), suit(cardsPlayed[[winInd]]))
+      if(number(cardsPlayed[[winInd]]) == "joker") winningCard = "joker"
+      message(paste0("Player ",winningPlayer," wins, with ", winningCard))
+    
+      if(winningPlayer==1 | winningPlayer == 3){
+        numTricks13 = numTricks13 + 1
+      }
+      if(winningPlayer==2 | winningPlayer == 4){
+        numTricks24 = numTricks24 + 1
+      }
+      
+      leadPlayer = winningPlayer
+      message("Players 1/3 have this many tricks:")
+      print(numTricks13)
+      message("Players 2/4 have this many tricks:")
+      print(numTricks24)
+    }  # finish playing tricks.
+  
+    ###################################
+    # determine winner and return the score
+    rowInd = which(rownames(scoreTable)==highBid[1])
+    colInd = which(colnames(scoreTable)==highBid[2])
+  
+    if((bidWinner==1 | bidWinner==3) & numTricks13>=as.numeric(highBid[1])){
+      message("players 1 and 3 have made their bid!")
+      score13 = score13 + scoreTable[rowInd, colInd]
+      score24 = score24 + 10*numTricks24
     }
-    
-    showHand(cardsPlayed)
-    
-    # figure out which card wins:
-    playerList = c(leadPlayer, nextPlayers)
-    trumpDeck = makeDeck(trump = highBid[2])
-    trumpBool = sapply(cardsPlayed, function(x) trump(x))
-    anyTrump = sum(trumpBool)
-    
-    if(anyTrump > 0){
-      trumpInds = which(trumpBool)
-      deckRank = sapply(trumpInds, function(x) findCard(trumpDeck, paste(number(cardsPlayed[[x]]), suit(cardsPlayed[[x]]))))
-      winInd = trumpInds[which.max(deckRank)]
+    if((bidWinner==2 | bidWinner==4) & numTricks24>=as.numeric(highBid[1])){
+      message("players 2 and 4 have made their bid!")
+      score24 = score24 + scoreTable[rowInd, colInd]
+      score13 = score13 + 10*numTricks13
     }
-    
-    if(anyTrump == 0){
-      followSuitInds = which(sapply(cardsPlayed, function(x) suit(x)==ledSuit))
-      deckRank = sapply(followSuitInds, function(x) findCard(trumpDeck, paste(number(cardsPlayed[[x]]), suit(cardsPlayed[[x]]))))
-      winInd = followSuitInds[which.max(deckRank)]
+    if((bidWinner==1 | bidWinner==3) & numTricks13<as.numeric(highBid[1])){
+      message("bummer - players 1 and 3 have been set.")
+      score13 = score13 - scoreTable[rowInd, colInd]
+      score24 = score24 + 10*numTricks24
     }
-    
-    winningPlayer = playerList[winInd]
-    winningCard = paste(number(cardsPlayed[[winInd]]), suit(cardsPlayed[[winInd]]))
-    if(number(cardsPlayed[[winInd]]) == "joker") winningCard = "joker"
-    message(paste0("Player ",winningPlayer," wins, with ", winningCard))
-    
-    if(winningPlayer==1 | winningPlayer == 3){
-      numTricks13 = numTricks13 + 1
+    if((bidWinner==2 | bidWinner==4) & numTricks24<as.numeric(highBid[1])){
+      message("bummer - players 2 and 4 have been set.")
+      score24 = score24 - scoreTable[rowInd, colInd]
+      score13 = score13 + 10*numTricks13
     }
-    if(winningPlayer==2 | winningPlayer == 4){
-      numTricks24 = numTricks24 + 1
-    }
+  
+    message("score update:")
+    message(paste0("players 1 and 3 have ", score13," points."))
+    message(paste0("players 2 and 4 have ", score24," points."))
     
-    leadPlayer = winningPlayer
-    message("Players 1/3 have this many tricks:")
-    print(numTricks13)
-    message("Players 2/4 have this many tricks:")
-    print(numTricks24)
-  }  # finish playing tricks.
+    dealer = dealer + 1
+    dealer = ifelse(dealer<=4, dealer, dealer %% 4)
+      
+  } ### END GIANT WHILE LOOP (nobody is above 500 or below -500)
   
   
-  if
+  if(score13 >= 500){
+    message("Players 1 and 3 WIN!")
+  }
+  if(score13 <= (-500)){
+    message("Players 2 and 4 win, by virtue of players 1 and 3 LOSING!")
+  }
+  if(score24 >= 500){
+    message("Players 2 and 4 WIN!")
+  }
+  if(score24 <= (-500)){
+    message("Players 1 and 3 win, by virtue of players 2 and 4 LOSING!")
+  }
+  
+  message("thank you for playing!")
   
 }
+
 
 
 
