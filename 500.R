@@ -37,6 +37,7 @@ setMethod("show", "card",
           }
 )
 
+# define a < or > method
 
 # function to create a deck (of cards):
 makeDeck = function(trump = NULL){
@@ -202,6 +203,62 @@ findCard = function(hand, cardname){
 
 
 
+
+
+
+
+
+
+
+
+
+### bidding action:
+makeBids = function(dealer, hands){
+  ## "dealer" = id of player who is now the dealer
+  ## "hands" = dealt deck object
+  highBid = NULL #(nobody has bid yet)
+  firstTwo = list() # so that second-partner-bidders can be reminded
+  firstBidders = c(1:3)+dealer
+  firstBidders = sapply(firstBidders, function(x){
+    if(x > 4){return(x %% 4)}; return(x)
+  })
+  biddingOrder = c(firstBidders, dealer)
+  
+  leadPlayer = NULL #(nobody is winning yet)
+  for(i in 1:4){
+    if(i==4) message("[dealer]")
+    message(paste0("player ", biddingOrder[i],": here is your hand." ))
+    showHand(hands[[i]])
+    if(i==4 | i==3) message(paste0("your partner has bid ", paste(firstTwo[[i-2]], collapse=" ")))
+    theBid = strsplit(readline("Please make your bid: "), split=" ")[[1]]
+    if(length(theBid)>1){
+      if(theBid[2]=="spades") theBid[2] = "aspades"
+    }
+    theBid = checkBid(theBid, highBid)  # this will ALWAYS result in either a "pass" or a new high bid.
+    
+    if(length(theBid)>1){
+      highBid = theBid 
+      leadPlayer = biddingOrder[i]
+    }
+    
+    # for printing only:
+    if(i==2 | i==1){
+      if(theBid[1]!="pass"){
+        if(theBid[2]=="aspades") theBid[2] <- "spades"
+      }
+      firstTwo[[i]] <- theBid
+    }
+    
+  } #end loop: finished bidding.
+  if(!is.null(highBid)){
+    if(highBid[1]=="6") leadPlayer = NULL #we don't play 6 bids    
+  }
+  
+  return(list(leadPlayer=leadPlayer, dealer=dealer, highBid=highBid, biddingOrder=biddingOrder))
+  
+} # end bidding function
+
+
 #############################
 ######## PLAY BALL!! ########
 #############################
@@ -230,45 +287,32 @@ play500 = function(){
   
     ###################################
     # have players bid:
-    highBid = NULL
-    firstTwo = list() # so that second-partner-bidders can be reminded
-    firstBidders = c(1:3)+dealer
-    firstBidders = sapply(firstBidders, function(x){
-      if(x > 4){return(x %% 4)}; return(x)
-    })
-    biddingOrder = c(firstBidders, dealer)
-    for(i in 1:4){
-      if(i==4) message("[dealer]")
-      message(paste0("player ", biddingOrder[i],": here is your hand." ))
-      showHand(hands[[i]])
-      if(i==4 | i==3) message(paste0("your partner has bid ", paste(firstTwo[[i-2]], collapse=" ")))
-      theBid = strsplit(readline("Please make your bid: "), split=" ")[[1]]
-      if(length(theBid)>1){
-        if(theBid[2]=="spades") theBid[2] = "aspades"
-      }
-      theBid = checkBid(theBid, highBid)  # this will ALWAYS result in either a "pass" or a new high bid.
+    bidObject = makeBids(dealer, hands)
+    leadPlayer = bidObject$leadPlayer
     
-      if(length(theBid)>1){
-        highBid = theBid 
-        leadPlayer = biddingOrder[i]
+    # check that a valid bid was actually made
+    while(is.null(leadPlayer)){
+      newDealer = bidObject$dealer+1
+      newDealer = ifelse(newDealer == 5, 1, newDealer)
+      if(!is.null(bidObject$highBid)){
+        message(paste("House rules: play only continues if the highest bid is at least 7. Deal moves to player", newDealer))
       }
-    
-      # for printing only:
-      if(i==2 | i==1){
-        if(theBid[1]!="pass"){
-          if(theBid[2]=="aspades") theBid[2] <- "spades"
-        }
-        firstTwo[[i]] <- theBid
+      if(is.null(bidObject$highBid)){
+        message(paste("Everyone has passed.  Deal moves to player",newDealer))
       }
-      
-    } #end loop: finished bidding.
-    bidWinner = leadPlayer #(leadPlayer will change later)
+      message(paste("Player",newDealer,"is dealing."))
+      hands = deal(deck)
+      bidObject = makeBids(newDealer, hands)
+      dealer = newDealer # to use at end of the hand
+      leadPlayer = bidObject$leadPlayer
+    }
   
     ###################################
-    # determine the winning bid:
-    if(is.null(highBid)) print("Everyone has passed: re-dealing.")
-    if(highBid[1]=="6") print("House rules: play only continues if the highest bid is at least 7.  Re-dealing.")
-  
+    # determine the winning bid, and in which order everyone bid:
+    bidWinner = leadPlayer #(leadPlayer will change in later tricks, but bidWinner needs to be stored)
+    highBid = bidObject$highBid
+    biddingOrder = bidObject$biddingOrder
+    
     if(highBid[2]=="aspades") highBid[2] = "spades"
     message(paste0("Player ",leadPlayer," wins the bid with ",paste(highBid, collapse=" ")))
   
