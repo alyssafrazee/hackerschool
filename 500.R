@@ -536,7 +536,8 @@ play500 = function(){
 
 
 
-
+### And, now you can play the game:
+play500()
 
 
 
