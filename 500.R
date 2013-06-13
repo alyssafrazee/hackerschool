@@ -243,7 +243,7 @@ play500 = function(){
       showHand(hands[[i]])
       if(i==4 | i==3) message(paste0("your partner has bid ", paste(firstTwo[[i-2]], collapse=" ")))
       theBid = strsplit(readline("Please make your bid: "), split=" ")[[1]]
-      if(length(theBid)==2){
+      if(length(theBid)>1){
         if(theBid[2]=="spades") theBid[2] = "aspades"
       }
       theBid = checkBid(theBid, highBid)  # this will ALWAYS result in either a "pass" or a new high bid.
@@ -263,8 +263,6 @@ play500 = function(){
       
     } #end loop: finished bidding.
     bidWinner = leadPlayer #(leadPlayer will change later)
-    print(bidWinner)
-
   
     ###################################
     # determine the winning bid:
@@ -279,7 +277,8 @@ play500 = function(){
     message(paste0("Player ", leadPlayer,": the kitty is here:"))
     showHand(hands$kitty)
     message("and again, here is your hand:")
-    showHand(hands[[biddingOrder[leadPlayer]]])
+    leadHandIndex = which(biddingOrder==leadPlayer)
+    showHand(hands[[leadHandIndex]])
     message("of these 15 cards, enter the 10 you would like to keep.")
   
     # (pick 10 cards)
@@ -294,7 +293,7 @@ play500 = function(){
           message("Invalid card - try again.") 
           next
         }
-        tryJoker = findCard(hands[[biddingOrder[leadPlayer]]], "joker")
+        tryJoker = findCard(hands[[leadHandIndex]], "joker")
         if(length(tryJoker)==0){
           tryJokerKitty = findCard(hands$kitty, "joker")
             if(length(tryJokerKitty)==0){
@@ -314,7 +313,7 @@ play500 = function(){
       if(length(cardname)>1){
         
         # make sure it's in this player's hand:
-        tryCard = findCard(hands[[biddingOrder[leadPlayer]]], paste(cardname, collapse=" "))
+        tryCard = findCard(hands[[leadHandIndex]], paste(cardname, collapse=" "))
         if(length(tryCard)==0){
           tryCardKitty = findCard(hands$kitty, paste(cardname, collapse=" "))
           if(length(tryCardKitty)==0){
@@ -349,7 +348,7 @@ play500 = function(){
       j = j+1
       
     } # finish choosing hand
-    hands[[biddingOrder[leadPlayer]]] = newHand
+    hands[[leadHandIndex]] = newHand
   
     ###################################
     # sort and assign trump to each player's hand
@@ -364,22 +363,24 @@ play500 = function(){
     # play the game :) 
   
     # we already have a lead player (leadPlayer = 1, 2, 3, or 4 depending on who won the bid)
+    # OR lead player was set at the end of the previous trick.
     for(trick in 1:10){
+      leadHandIndex = which(biddingOrder==leadPlayer)
       cardsPlayed = list() 
       message(paste0("Player ", leadPlayer,": here is your hand. It's your lead!"))
-      showHand(sortHand(hands[[biddingOrder[leadPlayer]]], trump = highBid[2]))
+      showHand(sortHand(hands[[leadHandIndex]], trump = highBid[2]))
       ledCard = readline("what card would you like to play? ")
-      ledCardInd = findCard(hands[[biddingOrder[leadPlayer]]], ledCard)
+      ledCardInd = findCard(hands[[leadHandIndex]], ledCard)
       while(length(ledCardInd)==0){
         ledCard = readline("this card is not in your hand - choose another: ")
-        ledCardInd = findCard(hands[[biddingOrder[leadPlayer]]], ledCard)
+        ledCardInd = findCard(hands[[leadHandIndex]], ledCard)
         }
       
       # add card to the middle:
-      cardsPlayed = append(cardsPlayed, hands[[biddingOrder[leadPlayer]]][[ledCardInd]])
+      cardsPlayed = append(cardsPlayed, hands[[leadHandIndex]][[ledCardInd]])
     
       # remove card from your hand:
-      hands[[biddingOrder[leadPlayer]]] = hands[[biddingOrder[leadPlayer]]][-ledCardInd]
+      hands[[leadHandIndex]] = hands[[leadHandIndex]][-ledCardInd]
     
       # figure out which suit was led:
       ledSuit = ifelse(trump(cardsPlayed[[1]]), highBid[2], suit(cardsPlayed[[1]]))
@@ -391,8 +392,9 @@ play500 = function(){
       })
     
       for(player in nextPlayers){
+        handIndex = which(biddingOrder == player)
         message(paste0("Player ", player,": here is your hand. It's your turn!"))
-        showHand(sortHand(hands[[biddingOrder[player]]], trump = highBid[2]))
+        showHand(sortHand(hands[[handIndex]], trump = highBid[2]))
         message(paste("led:", ledCard))
         
         if(length(cardsPlayed)>1){
@@ -406,32 +408,32 @@ play500 = function(){
         }# end if(length(cardsPlayed)>1)
         
         chosenCard = readline("what card would you like to play? ")
-        chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+        chosenCardInd = findCard(hands[[handIndex]], chosenCard)
         while(length(chosenCardInd)==0){
           chosenCard = readline("this card is not in your hand - choose another: ")
-          chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
+          chosenCardInd = findCard(hands[[handIndex]], chosenCard)
         }
-        chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]
+        chosenCard.obj = hands[[handIndex]][[chosenCardInd]]
       
         # did the player have any of the suit that was led?
         if(trump(cardsPlayed[[1]])){
           # if trump was led:
-          howManyTrump = sum(sapply(hands[[biddingOrder[player]]], function(x) trump(x)))
+          howManyTrump = sum(sapply(hands[[handIndex]], function(x) trump(x)))
           while(!trump(chosenCard.obj) & howManyTrump!=0){
             message(paste0("you must follow suit (suit led: ", ledSuit,")"))
             chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
-            chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
-            chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]
+            chosenCardInd = findCard(hands[[handIndex]], chosenCard)
+            chosenCard.obj = hands[[handIndex]][[chosenCardInd]]
           }
         }
         if(!trump(cardsPlayed[[1]])){
           # if off-suit was led:
-          howManyOfSuit = sum(sapply(hands[[biddingOrder[player]]], function(x) suit(x)==ledSuit))
+          howManyOfSuit = sum(sapply(hands[[handIndex]], function(x) (suit(x)==ledSuit & !trump(x))))
           while(suit(chosenCard.obj)!=ledSuit & howManyOfSuit!=0){
             message(paste0("you must follow suit (suit led: ", ledSuit,")"))
             chosenCard = readline(paste0("please play a ", substr(ledSuit,1,nchar(ledSuit)-1),": "))
-            chosenCardInd = findCard(hands[[biddingOrder[player]]], chosenCard)
-            chosenCard.obj = hands[[biddingOrder[player]]][[chosenCardInd]]          
+            chosenCardInd = findCard(hands[[handIndex]], chosenCard)
+            chosenCard.obj = hands[[handIndex]][[chosenCardInd]]          
           }
         }
       
@@ -439,7 +441,7 @@ play500 = function(){
         cardsPlayed = append(cardsPlayed, chosenCard.obj)
       
         # remove card from your hand:
-        hands[[biddingOrder[player]]] = hands[[biddingOrder[player]]][-chosenCardInd]
+        hands[[handIndex]] = hands[[handIndex]][-chosenCardInd]
       } # all players are done playing
     
       showHand(cardsPlayed)
