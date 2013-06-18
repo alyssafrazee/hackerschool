@@ -1,0 +1,22 @@
+# contributing to open source - notes
+# session w/ Mel Chua (resident)
+# june 18, 2013
+
+EXAMPLE OF FINDING AN OPEN-SOURCE PROJECT TO WORK ON:
+topic: graphics rendering
+google: graphics rendering open source
+open some project pages
+--see if you can download the software yourself
+--find contact information for developers, page showing how you contribute to the project, determine whether the project is still being updated/ongoing, look for bug tracker, check how recently the forums have been updated, "mean person check" (do people respond nicely to questions?)
+--"bug tracker": giant shared to-do list for a project (e.g. - issues in github)
+--follow specific people: in the forums, in the bug tracker, etc. (active developers) - follow their commits.
+--basically you need to decide whether this is a good project with smart, nice developers.
+--working on an issue in the bug tracker is probably not a race - there is always a lot of work to be done, and not enough people to do it.
+** focus more on the community and how good/nice/active they are, rather than the technical details and whether or not you have the technical skills to contribute.  "the people are more important than the code."
+
+HOW TO START CONTRIBUTING:
+"learn how to overhear things, and how to contribute to that conversation"
+sometimes the bug tracker will have a newbies section
+sometimes you need to "wikipedia your way through the words"
+subscribe to commit notifications (RSS feed, mailing list, etc.) and don't reply for at least a week.
+send your introduction email to 2-3 projects - see if you get a reply, or if the reply is mean :)
