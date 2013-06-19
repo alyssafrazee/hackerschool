@@ -1,0 +1,3 @@
+import(methods)
+export(play500)
+exportMethods(suit, number, trump, show, "trump<-")
