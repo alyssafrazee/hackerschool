@@ -1,0 +1,21 @@
+Package: R500
+Maintainer: Alyssa Frazee <alyssa.frazee@gmail.com>
+Author: Alyssa Frazee
+Version: 1.0
+License: GPL-3
+Title: 500
+Description: command-line implementation of the card game 500
+Depends:
+Collate:
+    'R500-package.R'
+    'card-class.R'
+    'checkBid.R'
+    'compare.R'
+    'compareBids.R'
+    'deal.R'
+    'findCard.R'
+    'makeBids.R'
+    'makeDeck.R'
+    'play500.R'
+    'showHand.R'
+    'sortHand.R'
