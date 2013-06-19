@@ -3,7 +3,7 @@
 
 
 #### the card class:
-class card:
+class Card:
     def __init__(self, suit, number, trump=False, lowBower=False):
         self.suit = suit
         self.number = number
@@ -55,7 +55,7 @@ class card:
                 shown = shown+" [trump]"
             return shown
         
-class bid:
+class Bid:
     def __init__(self, number, suit):
         self.number = number
         self.suit = suit
