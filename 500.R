@@ -185,6 +185,7 @@ checkBid = function(bid, highBid){
 
 
 # function to find a given card in a hand
+
 findCard = function(hand, cardname){
   # cardname = string, such as "joker", "A hearts", etc.
   # hand is a list of cards.
