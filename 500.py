@@ -377,6 +377,8 @@ def play500():
     
     # goodbye.
     print "thank you for playing!"    
+
+play500()
     
 
     
