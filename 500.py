@@ -3,7 +3,7 @@
 
 
 #### the card class:
-class card(object):
+class Card(object):
     def __init__(self, suit, number, trump=False, lowBower=False):
         self.suit = suit
         self.number = number
@@ -55,7 +55,7 @@ class card(object):
                 shown = shown+" [trump]"
             return shown
         
-class bid(object):
+class Bid(object):
     def __init__(self, number, suit):
         self.number = number
         self.suit = suit
@@ -102,7 +102,7 @@ def getBids(dealer, hands):
     
     for p in players:
         if p == players[0]:
-            currentBid = bid(0,'spades') 
+            currentBid = Bid(0,'spades') 
         print "Player ", p, ": here is your hand.  It's your bid." 
         hands[str(p)].sort()
         for c in hands[str(p)]:
@@ -122,7 +122,7 @@ def validateBid(theBid, currentBid):
     #    return validateBid(raw_input("enter bid: "), currentBid)
 
     if theBid == 'pass':
-        return bid(number=0, suit='spades')
+        return Bid(number=0, suit='spades')
     
     else:
         theBid = theBid.split(' ')
@@ -132,7 +132,7 @@ def validateBid(theBid, currentBid):
             return validateBid(theBid, currentBid)
         
         else:
-            theBid = bid(number=int(theBid[0]), suit=theBid[1])
+            theBid = Bid(number=int(theBid[0]), suit=theBid[1])
             if theBid <= currentBid:
                 theBid = raw_input("you must bid higher than the current bid ("+str(currentBid)+"): ")
                 return validateBid(theBid, currentBid)
@@ -142,18 +142,18 @@ def validateBid(theBid, currentBid):
 # low bower helper function
 def getLowBower(trump):
     if trump == "hearts":
-        lb = card(suit = "diamonds", number = "J")
+        lb = Card(suit = "diamonds", number = "J")
     elif trump == "diamonds":
-        lb = card(suit = "hearts", number = "J")
+        lb = Card(suit = "hearts", number = "J")
     elif trump == "spades":
-        lb = card(suit = "clubs", number = "J")
+        lb = Card(suit = "clubs", number = "J")
     elif trump == "clubs":
-        lb = card(suit = "spades", number = "J")
+        lb = Card(suit = "spades", number = "J")
     elif trump == "notrump":
-        lb = card(suit = "none", number = 0)
+        lb = Card(suit = "none", number = 0)
     else:
         print "invalid suit"
-        lb = card(suit = "none", number = 0)
+        lb = Card(suit = "none", number = 0)
     return lb
 
 # helper function 3: choosing cards from kitty
@@ -198,7 +198,7 @@ def validateCard(cardString, hand, trump, newHand):
     #    theCard = validateCard(raw_input("enter card: "), hand, trump, newHand)
     
     if cardString == "joker":
-        theCard = card(suit=trump, number="joker", trump=True)
+        theCard = Card(suit=trump, number="joker", trump=True)
     
     else:
         cardList = cardString.split(' ')
@@ -208,7 +208,7 @@ def validateCard(cardString, hand, trump, newHand):
         else:
             if cardList[0] in [str(i) for i in range(4,11)]:
                 cardList[0] = int(cardList[0])
-            theCard = card(suit=cardList[1], number=cardList[0], trump = cardList[1]==trump)
+            theCard = Card(suit=cardList[1], number=cardList[0], trump = cardList[1]==trump)
             if theCard == getLowBower(trump):
                 theCard.trump = True
                 theCard.lowBower = True
@@ -317,12 +317,12 @@ def play500():
     deck = []
     for num in range(4,11)+["J","Q","K","A"]:
         for suit in 'spades','clubs','diamonds','hearts':
-            deck.append(card(suit=suit, number=num))
-    deck.append(card(suit='none', number='joker'))
+            deck.append(Card(suit=suit, number=num))
+    deck.append(Card(suit='none', number='joker'))
     
     # begin game play:
     while -500 < score13 < 500 and -500 < score24 < 500:
-        print "player ", getPlayer(dealer), " is dealing."
+        print "player", getPlayer(dealer), "is dealing."
         
         # shuffle and deal:
         hands = shuffleDeal(deck, handsize = 10, kittySize = 5)
@@ -333,9 +333,9 @@ def play500():
         # make sure the bid was high enough:
         if highBid[0].number == 0 or highBid[0].number == 6:
             if highBid[0].number == 0:
-                print "everyone has passed. deal passes to player ", getPlayer(dealer+1)
+                print "everyone has passed. deal passes to player", getPlayer(dealer+1)
             else:
-                print "house rules: we don't play 6 bids.  deal passes to player ", getPlayer(dealer+1)
+                print "house rules: we don't play 6 bids.  deal passes to player", getPlayer(dealer+1)
             dealer += 1
             continue
         
@@ -348,7 +348,7 @@ def play500():
             playOrder = [getPlayer(x) for x in range(leadPlayer, leadPlayer+4)]
             cardsPlayed = []
             for p in playOrder:
-                print "player ", p, ": it's your turn. Here is your hand: "
+                print "player", p, ": it's your turn. Here is your hand: "
                 for c in hands[str(p)]:
                     print c
                 selectedCardString = raw_input("Which card would you like to play? ")
@@ -357,7 +357,7 @@ def play500():
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winningCard = max(contenders)
             winningPlayer = playOrder[cardsPlayed.index(winningCard)]
-            print "player", winningPlayer, " wins with ", winningCard
+            print "player", winningPlayer, "wins with", winningCard
             
             # increment hand scores:
             if winningPlayer==1 or winningPlayer==3:
