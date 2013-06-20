@@ -20,4 +20,4 @@ install_github("hackerschool", "alyssafrazee", subdir="R500")
 library(R500)
 play500()
 ```
-If you don't know how to play 500, the rules are [here](http://en.wikipedia.org/wiki/500_(card_game)). The script "500.py" in this repo is the python version - just run it, and you'll be dropped into a game.
+If you don't know how to play 500, the rules are [here](http://en.wikipedia.org/wiki/500_(card_game) ). The script "500.py" in this repo is the python version - just run it, and you'll be dropped into a game.
