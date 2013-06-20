@@ -84,11 +84,9 @@ def shuffleDeal(deck, handsize, kittySize):
     import random
     random.shuffle(deck)
     hands = {}
-    hands['1'] = deck[0:handsize]
-    hands['2'] = deck[handsize:handsize*2]
-    hands['3'] = deck[handsize*2:handsize*3]
-    hands['4'] = deck[handsize*3:handsize*4]
-    hands['kitty'] = deck[handsize*4:]
+    hand_names = [str(i) for i in range(1,5)] + ['kitty']
+    for i, hand in enumerate(hand_names):
+        hands[hand] = deck[i*handsize:(i+1)*handsize]
     return hands
 
 def getPlayer(x):
