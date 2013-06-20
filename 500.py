@@ -80,16 +80,15 @@ class bid(object):
             return str(self.number)+' '+self.suit
 
 # helper function 1: shuffle and deal the deck
-def shuffleDeal(deck, handSize, kittySize):
+def shuffleDeal(deck, handsize, kittySize):
     import random
-    inds = range(0, len(deck))
-    random.shuffle(inds)
+    random.shuffle(deck)
     hands = {}
-    hands['1'] = [deck[i] for i in inds[0:(handSize)]]
-    hands['2'] = [deck[i] for i in inds[handSize:(2*handSize)]]
-    hands['3'] = [deck[i] for i in inds[(2*handSize):(3*handSize)]]
-    hands['4'] = [deck[i] for i in inds[(3*handSize):(4*handSize)]]
-    hands['kitty'] = [deck[i] for i in inds[-kittySize:]]
+    hands['1'] = deck[0:handsize]
+    hands['2'] = deck[handsize:handsize*2]
+    hands['3'] = deck[handsize*2:handsize*3]
+    hands['4'] = deck[handsize*3:handsize*4]
+    hands['kitty'] = deck[handsize*4:]
     return hands
 
 def getPlayer(x):
@@ -326,7 +325,7 @@ def play500():
         print "player ", getPlayer(dealer), " is dealing."
         
         # shuffle and deal:
-        hands = shuffleDeal(deck, handSize = 10, kittySize = 5)
+        hands = shuffleDeal(deck, handsize = 10, kittySize = 5)
         
         # bid:
         highBid = getBids(dealer, hands)
