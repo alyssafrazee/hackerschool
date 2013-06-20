@@ -103,7 +103,7 @@ def getBids(dealer, hands):
     for p in players:
         if p == players[0]:
             currentBid = Bid(0,'spades')
-        print "Player ", p, ": here is your hand.  It's your bid." 
+        print "Player", p, "- here is your hand.  It's your bid." 
         hands[str(p)].sort()
         for c in hands[str(p)]:
             print c
