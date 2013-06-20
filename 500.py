@@ -80,7 +80,7 @@ class Bid(object):
             return str(self.number)+' '+self.suit
     
     def __hash__(self):
-        return hash(self.number, self.suit)
+        return hash((self.number, self.suit))
 
 
 
