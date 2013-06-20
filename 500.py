@@ -278,6 +278,18 @@ def assign_points(score_dict, highbid, tricks13, tricks24, score13, score24):
 
     return score13, score24
 
+def end_game_message(score13, score24):
+    if score13>=500:
+        print "players 1 and 3 win!"
+    elif score13 <= -500:
+        print "players 2 and 4 win, because players 1 and 3 lose!"
+    elif score24 >= 500:
+        print "players 2 and 4 win!"
+    else:
+        print "players 1 and 3 win, because players 2 and 4 lose!"
+    
+    print "thank you for playing!"    
+
 
 #### PLAY GAME
 
@@ -369,18 +381,8 @@ def play500():
         # pass the deal to the next player:
         dealer += 1
 
-    # someone has won!
-    if score13>=500:
-        print "players 1 and 3 win!"
-    elif score13 <= -500:
-        print "players 2 and 4 win, because players 1 and 3 lose!"
-    elif score24 >= 500:
-        print "players 2 and 4 win!"
-    else:
-        print "players 1 and 3 win, because players 2 and 4 lose!"
-    
-    # goodbye.
-    print "thank you for playing!"    
+    end_game_message(score13, score24)
+
 
 play500()
     
