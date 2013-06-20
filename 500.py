@@ -46,7 +46,7 @@ class card(object):
             else:
                 return -1
                 
-    def __repr__(self):
+    def __str__(self):
         if self.number == 'joker':
             return 'joker [trump]'
         else:
@@ -73,7 +73,7 @@ class bid(object):
         else:
             return -1
     
-    def __repr__(self):
+    def __str__(self):
         if self.number == 0:
             return 'pass'
         else:
@@ -104,7 +104,7 @@ def getBids(dealer, hands):
     for p in players:
         if p == players[0]:
             currentBid = bid(0,'spades') 
-        print "Player "+str(p)+": here is your hand.  It's your bid." 
+        print "Player ", p, ": here is your hand.  It's your bid." 
         hands[str(p)].sort()
         for c in hands[str(p)]:
             print c
@@ -135,7 +135,7 @@ def validateBid(theBid, currentBid):
         else:
             theBid = bid(number=int(theBid[0]), suit=theBid[1])
             if theBid <= currentBid:
-                theBid = raw_input("you must bid higher than the current bid ("+repr(currentBid)+"): ")
+                theBid = raw_input("you must bid higher than the current bid ("+str(currentBid)+"): ")
                 return validateBid(theBid, currentBid)
             else:
                 return theBid
@@ -159,8 +159,8 @@ def getLowBower(trump):
 
 # helper function 3: choosing cards from kitty
 def pickUpKitty(highBid, hands):
-    print "player "+str(highBid[1])+" wins the bid with "+repr(highBid[0])
-    print "player "+str(highBid[1])+": here is the kitty:"
+    print "player ", highBid[1], " wins the bid with ", highBid[0]
+    print "player ", highBid[1], ": here is the kitty:"
     
     # sort hands and kitty with trump information:
     for k in hands.keys():
@@ -293,7 +293,7 @@ def play500():
     
     # begin game play:
     while score13<500 and score13>-500 and score24<500 and score24>-500:
-        print "player "+str(getPlayer(dealer))+" is dealing."
+        print "player ", getPlayer(dealer), " is dealing."
         
         # shuffle and deal:
         hands = shuffleDeal(deck, handSize = 10, kittySize = 5)
@@ -304,9 +304,9 @@ def play500():
         # make sure the bid was high enough:
         if highBid[0].number == 0 or highBid[0].number == 6:
             if highBid[0].number == 0:
-                print "everyone has passed. deal passes to player "+str(getPlayer(dealer+1))
+                print "everyone has passed. deal passes to player ", getPlayer(dealer+1)
             else:
-                print "house rules: we don't play 6 bids.  deal passes to player "+str(getPlayer(dealer+1))
+                print "house rules: we don't play 6 bids.  deal passes to player ", getPlayer(dealer+1)
             dealer += 1
             continue
         
@@ -319,16 +319,16 @@ def play500():
             playOrder = [getPlayer(x) for x in range(leadPlayer, leadPlayer+4)]
             cardsPlayed = []
             for p in playOrder:
-                print "player "+str(p)+": it's your turn. Here is your hand: "
+                print "player ", p, ": it's your turn. Here is your hand: "
                 for c in hands[str(p)]:
-                    print repr(c)
+                    print c
                 selectedCardString = raw_input("Which card would you like to play? ")
                 selectedCard = validateCard(selectedCardString, hands[str(p)], highBid[0].suit, None)
                 playCard(selectedCard, highBid[0].suit, p, hands, cardsPlayed)
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winningCard = max(contenders)
             winningPlayer = playOrder[cardsPlayed.index(winningCard)]
-            print "player "+str(winningPlayer)+" wins with "+repr(winningCard)
+            print "player", winningPlayer, " wins with ", winningCard
             
             # increment hand scores:
             if winningPlayer==1 or winningPlayer==3:
