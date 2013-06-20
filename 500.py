@@ -90,7 +90,9 @@ def shuffleDeal(deck, handsize, kittySize):
     return hands
 
 def getPlayer(x):
-    return x - (((x-1)/4)*4)
+    while x > 4:
+        x -= 4
+    return x
 
 # helper function 2: bids
 def getBids(dealer, hands):
