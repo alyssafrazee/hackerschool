@@ -260,6 +260,24 @@ def playCard(selectedCard, trump, p, hands, cardsPlayed):
 #    print "players 1 and 3 have "+score13+" points, and they have taken #"+tricks13+" tricks so far."
 #    print "players 2 and 4 have "+score24+" points, and they have taken #"+tricks24+" tricks so far."
 
+def assign_points(score_dict, highbid, tricks13, tricks24, score13, score24):
+    if highBid[1] == 1 or highBid[1] == 3:
+        if tricks13 >= highBid[0].number:
+            print "players 1 and 3 have made their bid!"
+            score13 += scoreDict[repr(highBid[0])]
+        else:
+            print "players 1 and 3 have been set."
+            score13 -= scoreDict[repr(highBid[0])]
+    else:
+        if tricks24 >= highBid[0].number:
+            print "players 2 and 4 have made their bid!"
+            score24 += scoreDict[repr(highBid[0])]
+        else:
+            print "players 2 and 4 have been set."
+            score24 -= scoreDict[repr(highBid[0])]
+
+    return score13, score24
+
 
 #### PLAY GAME
 
@@ -339,21 +357,7 @@ def play500():
             # pass lead to winning player:
             leadPlayer = winningPlayer
         
-        # assign points:
-        if highBid[1] == 1 or highBid[1] == 3:
-            if tricks13 >= highBid[0].number:
-                print "players 1 and 3 have made their bid!"
-                score13 += scoreDict[repr(highBid[0])]
-            else:
-                print "players 1 and 3 have been set."
-                score13 -= scoreDict[repr(highBid[0])]
-        else:
-            if tricks24 >= highBid[0].number:
-                print "players 2 and 4 have made their bid!"
-                score24 += scoreDict[repr(highBid[0])]
-            else:
-                print "players 2 and 4 have been set."
-                score24 -= scoreDict[repr(highBid[0])]
+        score13, score24 = assign_points(score_dict, highbid, tricks13, tricks24, score13, score24)
         
         # reset trump:
         for c in deck:
