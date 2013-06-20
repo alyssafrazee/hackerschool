@@ -78,6 +78,11 @@ class Bid(object):
             return 'pass'
         else:
             return str(self.number)+' '+self.suit
+    
+    def __hash__(self):
+        return hash(self.number, self.suit)
+
+
 
 # helper function 1: shuffle and deal the deck
 def shuffleDeal(deck, handsize, kittySize):
@@ -309,8 +314,7 @@ def play500():
     points = 140
     for num in range(7,11):
         for suit in 'spades','clubs','diamonds','hearts','notrump':
-            k = str(num)+' '+suit
-            score_dict[k] = points
+            score_dict[Bid(num, suit)] = points
             points += 20
     
     # create a deck:
