@@ -292,7 +292,7 @@ def play500():
     deck.append(card(suit='none', number='joker'))
     
     # begin game play:
-    while score13<500 and score13>-500 and score24<500 and score24>-500:
+    while -500 < score13 < 500 and -500 < score24 < 500:
         print "player ", getPlayer(dealer), " is dealing."
         
         # shuffle and deal:
