@@ -83,7 +83,6 @@ class Bid(object):
         return hash((self.number, self.suit))
 
 
-
 # helper function 1: shuffle and deal the deck
 def shuffleDeal(deck, handsize, kittySize):
     import random
@@ -268,17 +267,17 @@ def assign_points(score_dict, highBid, tricks13, tricks24, score13, score24):
     if highBid[1] == 1 or highBid[1] == 3:
         if tricks13 >= highBid[0].number:
             print "players 1 and 3 have made their bid!"
-            score13 += score_dict[repr(highBid[0])]
+            score13 += score_dict[highBid[0]]
         else:
             print "players 1 and 3 have been set."
-            score13 -= score_dict[repr(highBid[0])]
+            score13 -= score_dict[highBid[0]]
     else:
         if tricks24 >= highBid[0].number:
             print "players 2 and 4 have made their bid!"
-            score24 += score_dict[repr(highBid[0])]
+            score24 += score_dict[highBid[0]]
         else:
             print "players 2 and 4 have been set."
-            score24 -= score_dict[repr(highBid[0])]
+            score24 -= score_dict[highBid[0]]
 
     return score13, score24
 
