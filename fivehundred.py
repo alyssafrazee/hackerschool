@@ -101,14 +101,14 @@ def getPlayer(x):
 # helper function 2: bids
 def getBids(dealer, hands):
     firstBidder = dealer+1
-    players = [getPlayer(x) for x in range(firstBidder, firstBidder+4)]
+    players = [str(getPlayer(x)) for x in range(firstBidder, firstBidder+4)]
     winningPlayer = 0
     
     currentBid = Bid(0,'spades')
     for p in players:
         print "Player", p, "- here is your hand.  It's your bid." 
-        hands[str(p)].sort()
-        for c in hands[str(p)]:
+        hands[p].sort()
+        for c in hands[p]:
             print c
         theBid = validateBid(raw_input("what do you bid? "), currentBid)
         if theBid.number != 0:
