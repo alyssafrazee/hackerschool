@@ -234,7 +234,7 @@ def validateCard(message, hand, trump, newHand):
 
 
 def validate_move(selectedCard, trump, p, hands, cardsPlayed):
-    # selectedCard must already be validated for hands[str(p)]
+    # selectedCard must already be validated for hands[p]
 
     if cardsPlayed == []:
        return True
