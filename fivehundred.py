@@ -215,14 +215,14 @@ def validateCard(message, hand, trump, newHand):
                 theCard.trump = True
                 theCard.lowBower = True
         
-        if theCard not in hand:
-            message = "you don't have this card, please enter another card: "
-            theCard = validateCard(message, hand, trump, newHand)
+    if theCard not in hand:
+        message = "you don't have this card, please enter another card: "
+        theCard = validateCard(message, hand, trump, newHand)
         
-        if newHand:
-            if theCard in newHand:
-                message = "you have already chosen this card, please choose a different one: "
-                theCard = validateCard(message, hand, trump, newHand)
+    if newHand:
+        if theCard in newHand:
+            message = "you have already chosen this card, please choose a different one: "
+            theCard = validateCard(message, hand, trump, newHand)
         
     return theCard
 
