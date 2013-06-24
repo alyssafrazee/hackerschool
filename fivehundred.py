@@ -2,7 +2,7 @@
 ## AF June 17 2013
 
 
-#### the card class:
+#### the card and bid classes:
 class Card(object):
     def __init__(self, suit, number, trump=False, lowBower=False):
         self.suit = suit
@@ -100,11 +100,11 @@ def getPlayer(x):
 
 # helper function 2: bids
 def get_high_bid(dealer, hands):
-    firstBidder = dealer+1
-    players = [str(getPlayer(x)) for x in range(firstBidder, firstBidder+4)]
-    winningPlayer = 0
+    first_bidder = dealer+1
+    players = [str(getPlayer(x)) for x in range(first_bidder, first_bidder+4)]
+    winning_player = 0
     
-    currentBid = Bid(0,'spades')
+    current_bid = Bid(0,'spades')
     for p in players:
         print "Player", p, "- here is your hand.  It's your bid." 
         hands[p].sort()
@@ -112,10 +112,10 @@ def get_high_bid(dealer, hands):
             print c
         theBid = validateBid(raw_input("what do you bid? "), currentBid)
         if theBid.number != 0:
-            currentBid = theBid
-            winningPlayer = p
+            current_bid = theBid
+            winning_player = p
     
-    return [currentBid, winningPlayer]
+    return [current_bid, winning_player]
 
 # helper function for bidding: checking whether a bid is valid
 def validateBid(theBid, currentBid):
@@ -155,9 +155,9 @@ def getLowBower(trump):
         sys.exit()
 
 # helper function 3: choosing cards from kitty
-def pickUpKitty(high_bid, leadPlayer, hands):
-    print "player ", leadPlayer, " wins the bid with ", high_bid
-    print "player ", leadPlayer, ": here is the kitty:"
+def pickUpKitty(high_bid, lead_player, hands):
+    print "player ", lead_player, " wins the bid with ", high_bid
+    print "player ", lead_player, ": here is the kitty:"
     
     # sort hands and kitty with trump information:
     for k in hands.keys():
@@ -176,16 +176,16 @@ def pickUpKitty(high_bid, leadPlayer, hands):
     for c in hands['kitty']:
         print c
     print "and again, here is your hand:"
-    for c in hands[str(leadPlayer)]:
+    for c in hands[str(lead_player)]:
         print c
     newHand = []
     newcard = 0
     print "of these 15 cards, choose the 10 you would like to keep."
     for newcard in range(10):
-        newHand.append(validateCard("card "+str(newcard+1)+": ", hands[str(leadPlayer)]+hands['kitty'], high_bid.suit, newHand))
+        newHand.append(validateCard("card "+str(newcard+1)+": ", hands[str(lead_player)]+hands['kitty'], high_bid.suit, newHand))
         
     newHand.sort()
-    hands[str(leadPlayer)] = newHand
+    hands[str(lead_player)] = newHand
     return hands
 
 # helper function for choosing and playing cards:
@@ -345,8 +345,9 @@ def play500():
         hands = shuffleDeal(deck, handsize = 10, kittySize = 5)
         
         # bid:
-        high_bid, leadPlayer = get_high_bid(dealer, hands)
-        
+        high_bid, lead_player = get_high_bid(dealer, hands)
+        bid_winner =  lead_player
+                
         # make sure the bid was high enough:
         if high_bid.number == 0 or high_bid.number == 6:
             if high_bid.number == 0:
@@ -357,11 +358,11 @@ def play500():
             continue
         
         # bid winner picks up the kitty
-        hands = pickUpKitty(high_bid, leadPlayer, hands)
+        hands = pickUpKitty(high_bid, lead_player, hands)
         
         # play the tricks:
         for trick in range(10):
-            playOrder = [str(getPlayer(x)) for x in range(leadPlayer, leadPlayer+4)]
+            playOrder = [str(getPlayer(x)) for x in range(lead_player, lead_player+4)]
             cardsPlayed = []
             for p in playOrder:
                 print "player", p, ": it's your turn. Here is your hand: "
@@ -375,18 +376,18 @@ def play500():
                 hands[p].remove(selectedCard)
 
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
-            winningCard = max(contenders)
-            winningPlayer = playOrder[cardsPlayed.index(winningCard)]
-            print "player", winningPlayer, "wins with", winningCard
+            winning_card = max(contenders)
+            winning_player = playOrder[cardsPlayed.index(winning_card)]
+            print "player", winning_player, "wins with", winning_card
             
             # increment hand scores:
-            if winningPlayer==1 or winningPlayer==3:
+            if winning_player==1 or winning_player==3:
                 tricks13 += 1
             else:
                 tricks24 += 1
             
             # pass lead to winning player:
-            leadPlayer = winningPlayer
+            lead_player = winning_player
         
         score13, score24 = assign_points(score_dict, highBid, tricks13, tricks24, score13, score24)
         
