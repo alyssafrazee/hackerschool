@@ -317,6 +317,7 @@ def reset_trump(deck):
             c.lowBower = False
         else:
             c.suit = 'none'
+    return deck
 
 
 #### PLAY GAME
