@@ -386,7 +386,8 @@ def play500():
     end_game_message(score13, score24)
 
 
-play500()
+if __name__ == '__main__':
+    play500()
     
 
     
