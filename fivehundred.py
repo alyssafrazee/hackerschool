@@ -264,17 +264,17 @@ def assign_points(score_dict, high_bid, bid_winner, tricks13, tricks24, score13,
     if bid_winner == 1 or bid_winner == 3:
         if tricks13 >= high_bid.number:
             print "players 1 and 3 have made their bid!"
-            score13 += score_dict[highBid[0]]
+            score13 += score_dict[high_bid]
         else:
             print "players 1 and 3 have been set."
-            score13 -= score_dict[highBid[0]]
+            score13 -= score_dict[high_bid]
     else:
         if tricks24 >= high_bid.number:
             print "players 2 and 4 have made their bid!"
-            score24 += score_dict[highBid[0]]
+            score24 += score_dict[high_bid]
         else:
             print "players 2 and 4 have been set."
-            score24 -= score_dict[highBid[0]]
+            score24 -= score_dict[high_bid]
 
     return score13, score24
 
