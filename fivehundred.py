@@ -303,13 +303,11 @@ def build_deck():
 
 def score_table():
     score_dict = {}
-    points = 140
-    for num in range(7,11):
-        for suit in 'spades','clubs','diamonds','hearts','notrump':
-            score_dict[Bid(num, suit)] = points
-            points += 20
-    return score_dict
 
+    for num in range(7, 11):
+        for i, suit in enumerate(['spades','clubs','diamonds','hearts','notrump']):
+            score_dict[Bid(num, suit)] = 140 + (20 * i) + 100 * (num - 7)
+    return score_dict
 
 #### PLAY GAME
 
