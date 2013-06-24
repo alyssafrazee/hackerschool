@@ -377,7 +377,7 @@ def play500():
 
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winning_card = max(contenders)
-            winning_player = playOrder[cardsPlayed.index(winning_card)]
+            winning_player = int(playOrder[cardsPlayed.index(winning_card)])
             print "player", winning_player, "wins with", winning_card
             
             # increment hand scores:
