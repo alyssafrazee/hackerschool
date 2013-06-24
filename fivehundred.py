@@ -154,7 +154,6 @@ def getLowBower(trump):
         print "invalid suit in getLowBower"
         sys.exit()
 
-
 # helper function 3: choosing cards from kitty
 def pickUpKitty(high_bid, leadPlayer, hands):
     print "player ", leadPlayer, " wins the bid with ", high_bid
@@ -227,7 +226,7 @@ def validateCard(message, hand, trump, newHand):
         
     return theCard
 
-
+# function to check whether you can actually play a card from your hand
 def validate_move(selectedCard, trump, p, hands, cardsPlayed):
     # selectedCard must already be validated for hands[p]
 
@@ -260,7 +259,7 @@ def validate_move(selectedCard, trump, p, hands, cardsPlayed):
             else:
                 return True
 
-
+# function for keeping score
 def assign_points(score_dict, highBid, tricks13, tricks24, score13, score24):
     if highBid[1] == 1 or highBid[1] == 3:
         if tricks13 >= highBid[0].number:
@@ -279,6 +278,7 @@ def assign_points(score_dict, highBid, tricks13, tricks24, score13, score24):
 
     return score13, score24
 
+# print message at end of game
 def end_game_message(score13, score24):
     if score13>=500:
         print "players 1 and 3 win!"
@@ -291,6 +291,7 @@ def end_game_message(score13, score24):
     
     print "thank you for playing!"    
 
+# create a deck of cards
 def build_deck():
     deck = []
     for num in range(4,11)+["J","Q","K","A"]:
@@ -299,6 +300,7 @@ def build_deck():
     deck.append(Card(suit='none', number='joker'))
     return deck
 
+# create the dictionary to keep score:
 def score_table():
     score_dict = {}
 
@@ -307,6 +309,7 @@ def score_table():
             score_dict[Bid(num, suit)] = 140 + (20 * i) + 100 * (num - 7)
     return score_dict
 
+# fix the trump settings after a hand has already been played
 def reset_trump(deck):
     for c in deck:
         if c.number != 'joker':
@@ -314,7 +317,7 @@ def reset_trump(deck):
             c.lowBower = False
         else:
             c.suit = 'none'
-        
+
 
 #### PLAY GAME
 
