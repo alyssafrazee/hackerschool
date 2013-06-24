@@ -197,12 +197,9 @@ def pickUpKitty(high_bid, leadPlayer, hands):
 def validateCard(message, hand, trump, newHand):
     card = raw_input(message)
     # hand is list of possible cards the card could come from
-<<<<<<< HEAD
-=======
-
+    
     card_values = ['4','5','6','7','8','9','10','J','Q','K','A']
     card_suits = ['spades','hearts','diamonds','clubs']
->>>>>>> 9bb1cd897843fc07022bb819080c6f5c96af78bd
     
     if card == "joker":
         theCard = Card(suit=trump, number="joker", trump=True)
@@ -343,15 +340,7 @@ def play500(testmodule):
         hands = shuffleDeal(deck, handsize = 10, kittySize = 5)
         
         # bid:
-<<<<<<< HEAD
-        if testmodule:
-            highBid = [Bid(8,'hearts'), 3]
-        else:
-            highBid = getBids(dealer, hands)
-        
-=======
         high_bid, leadPlayer = get_high_bid(dealer, hands)
->>>>>>> 9bb1cd897843fc07022bb819080c6f5c96af78bd
         
         # make sure the bid was high enough:
         if high_bid.number == 0 or high_bid.number == 6:
@@ -373,12 +362,6 @@ def play500(testmodule):
                 print "player", p, ": it's your turn. Here is your hand: "
                 for c in hands[p]:
                     print c
-<<<<<<< HEAD
-                selectedCardString = raw_input("Which card would you like to play? ")
-                selectedCard = validateCard(selectedCardString, hands[str(p)], highBid[0].suit, None)
-                
-                playCard(selectedCard, highBid[0].suit, p, hands, cardsPlayed)
-=======
                 valid_move = False
                 while not valid_move:
                     selectedCard = validateCard("Which card would you like to play? ", hands[p], high_bid.suit, None)
@@ -386,7 +369,6 @@ def play500(testmodule):
                 cardsPlayed.append(selectedCard)
                 hands[p].remove(selectedCard)
 
->>>>>>> 9bb1cd897843fc07022bb819080c6f5c96af78bd
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winningCard = max(contenders)
             winningPlayer = playOrder[cardsPlayed.index(winningCard)]
@@ -420,7 +402,6 @@ if __name__ == '__main__':
     play500()
     
 
-    
     
     
     
