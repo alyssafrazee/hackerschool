@@ -144,20 +144,20 @@ def validateBid(theBid, currentBid):
     
 # low bower helper function
 def getLowBower(trump):
-    if trump == "hearts":
-        lb = Card(suit = "diamonds", number = "J")
-    elif trump == "diamonds":
-        lb = Card(suit = "hearts", number = "J")
-    elif trump == "spades":
-        lb = Card(suit = "clubs", number = "J")
-    elif trump == "clubs":
-        lb = Card(suit = "spades", number = "J")
-    elif trump == "notrump":
-        lb = Card(suit = "none", number = 0)
-    else:
-        print "invalid suit"
-        lb = Card(suit = "none", number = 0)
-    return lb
+    lowBower = {
+                "hearts" : Card(suit = "diamonds", number = "J"),
+                "diamonds" : Card(suit = "hearts", number = "J"),
+                "spades" : Card(suit = "clubs", number = "J"),
+                "clubs" : Card(suit = "spades", number = "J"),
+                "notrump" : Card(suit = "none", number = 0),
+                }
+
+    try:
+        return lowBower[trump]
+    except KeyError:
+        print "invalid suit in getLowBower"
+        sys.exit()
+
 
 # helper function 3: choosing cards from kitty
 def pickUpKitty(highBid, hands):
