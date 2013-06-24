@@ -260,16 +260,16 @@ def validate_move(selectedCard, trump, p, hands, cardsPlayed):
                 return True
 
 # function for keeping score
-def assign_points(score_dict, highBid, tricks13, tricks24, score13, score24):
-    if highBid[1] == 1 or highBid[1] == 3:
-        if tricks13 >= highBid[0].number:
+def assign_points(score_dict, high_bid, bid_winner, tricks13, tricks24, score13, score24):
+    if bid_winner == 1 or bid_winner == 3:
+        if tricks13 >= high_bid.number:
             print "players 1 and 3 have made their bid!"
             score13 += score_dict[highBid[0]]
         else:
             print "players 1 and 3 have been set."
             score13 -= score_dict[highBid[0]]
     else:
-        if tricks24 >= highBid[0].number:
+        if tricks24 >= high_bid.number:
             print "players 2 and 4 have made their bid!"
             score24 += score_dict[highBid[0]]
         else:
@@ -346,8 +346,8 @@ def play500():
         
         # bid:
         high_bid, lead_player = get_high_bid(dealer, hands)
-        bid_winner =  lead_player
-                
+        bid_winner = lead_player # bid_winner is needed for score-keeping; lead_player changes during play.
+        
         # make sure the bid was high enough:
         if high_bid.number == 0 or high_bid.number == 6:
             if high_bid.number == 0:
@@ -389,7 +389,7 @@ def play500():
             # pass lead to winning player:
             lead_player = winning_player
         
-        score13, score24 = assign_points(score_dict, highBid, tricks13, tricks24, score13, score24)
+        score13, score24 = assign_points(score_dict, high_bid, bid_winner, tricks13, tricks24, score13, score24)
         
         # reset trump:
         deck = reset_trump(deck)
