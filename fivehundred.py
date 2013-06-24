@@ -293,6 +293,14 @@ def end_game_message(score13, score24):
     
     print "thank you for playing!"    
 
+def build_deck():
+    deck = []
+    for num in range(4,11)+["J","Q","K","A"]:
+        for suit in 'spades','clubs','diamonds','hearts':
+            deck.append(Card(suit=suit, number=num))
+    deck.append(Card(suit='none', number='joker'))
+    return deck
+
 
 #### PLAY GAME
 
@@ -316,12 +324,7 @@ def play500():
             score_dict[Bid(num, suit)] = points
             points += 20
     
-    # create a deck:
-    deck = []
-    for num in range(4,11)+["J","Q","K","A"]:
-        for suit in 'spades','clubs','diamonds','hearts':
-            deck.append(Card(suit=suit, number=num))
-    deck.append(Card(suit='none', number='joker'))
+    deck = build_deck()
     
     # begin game play:
     while -500 < score13 < 500 and -500 < score24 < 500:
