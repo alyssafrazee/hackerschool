@@ -149,7 +149,7 @@ def getLowBower(trump):
                 "diamonds" : Card(suit = "hearts", number = "J"),
                 "spades" : Card(suit = "clubs", number = "J"),
                 "clubs" : Card(suit = "spades", number = "J"),
-                "notrump" : Card(suit = "none", number = 0),
+                "notrump" : None,
                 }
 
     try:
