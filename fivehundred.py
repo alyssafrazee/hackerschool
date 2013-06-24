@@ -312,11 +312,18 @@ def score_table():
             score_dict[Bid(num, suit)] = 140 + (20 * i) + 100 * (num - 7)
     return score_dict
 
-play500(True)
+def reset_trump(deck):
+    for c in deck:
+        if c.number != 'joker':
+            c.trump = False
+            c.lowBower = False
+        else:
+            c.suit = 'none'
+        
 
 #### PLAY GAME
 
-def play500(testmodule):    
+def play500():    
     print "welcome to python 500!"
     
     # keep track of each team's score:
@@ -386,12 +393,8 @@ def play500(testmodule):
         score13, score24 = assign_points(score_dict, highBid, tricks13, tricks24, score13, score24)
         
         # reset trump:
-        for c in deck:
-            if c.number != 'joker':
-                c.trump = False
-            else:
-                c.suit = 'none'
-        
+        deck = reset_trump(deck)
+
         # pass the deal to the next player:
         dealer += 1
 
