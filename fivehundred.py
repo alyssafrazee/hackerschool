@@ -245,26 +245,26 @@ def validate_move(selectedCard, trump, p, hands, cardsPlayed):
         else:
             ledSuit = cardsPlayed[0].suit
 
+        suitsInHand = {c.suit for c in hands[p] if c != getLowBower(trump)}
+        if getLowBower(trump) in hands[p]:
+            suitsInHand.add(trump)
+
         if selectedCard.suit != ledSuit:
             if selectedCard == getLowBower(trump) and ledSuit == trump:
                return True
             else:
-                suitsInHand = {c.suit for c in hands[str(p)]}
-                if getLowBower(trump) in hands[str(p)]:
-                    suitsInHand.add(trump)
                 if ledSuit in suitsInHand:
                     print "Follow suit!"
                     return False
                 else:
                     return True
         else:
-           return True
+            if selectedCard == getLowBower(trump) and ledSuit in suitsInHand:
+                print "Follow suit! (low bower is a trump card)"
+                return False
+            else:
+                return True
 
-
-# seeing the scores:
-#def getScore():
-#    print "players 1 and 3 have "+score13+" points, and they have taken #"+tricks13+" tricks so far."
-#    print "players 2 and 4 have "+score24+" points, and they have taken #"+tricks24+" tricks so far."
 
 def assign_points(score_dict, highBid, tricks13, tricks24, score13, score24):
     if highBid[1] == 1 or highBid[1] == 3:
