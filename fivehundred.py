@@ -110,12 +110,12 @@ def get_high_bid(dealer, hands):
         hands[p].sort()
         for c in hands[p]:
             print c
-        theBid = validateBid(raw_input("what do you bid? "), currentBid)
+        theBid = validateBid(raw_input("what do you bid? "), current_bid)
         if theBid.number != 0:
             current_bid = theBid
             winning_player = p
     
-    return [current_bid, winning_player]
+    return [current_bid, int(winning_player)]
 
 # helper function for bidding: checking whether a bid is valid
 def validateBid(theBid, currentBid):
