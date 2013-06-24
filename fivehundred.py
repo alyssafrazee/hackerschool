@@ -301,6 +301,15 @@ def build_deck():
     deck.append(Card(suit='none', number='joker'))
     return deck
 
+def score_table():
+    score_dict = {}
+    points = 140
+    for num in range(7,11):
+        for suit in 'spades','clubs','diamonds','hearts','notrump':
+            score_dict[Bid(num, suit)] = points
+            points += 20
+    return score_dict
+
 
 #### PLAY GAME
 
@@ -316,13 +325,7 @@ def play500():
     # assign an initial dealer:
     dealer = 4
     
-    # create lookup table for scoring:
-    score_dict = {}
-    points = 140
-    for num in range(7,11):
-        for suit in 'spades','clubs','diamonds','hearts','notrump':
-            score_dict[Bid(num, suit)] = points
-            points += 20
+    score_dict = score_table()
     
     deck = build_deck()
     
