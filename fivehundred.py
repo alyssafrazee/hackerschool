@@ -104,9 +104,8 @@ def getBids(dealer, hands):
     players = [getPlayer(x) for x in range(firstBidder, firstBidder+4)]
     winningPlayer = 0
     
+    currentBid = Bid(0,'spades')
     for p in players:
-        if p == players[0]:
-            currentBid = Bid(0,'spades')
         print "Player", p, "- here is your hand.  It's your bid." 
         hands[str(p)].sort()
         for c in hands[str(p)]:
