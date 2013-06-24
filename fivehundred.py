@@ -232,16 +232,12 @@ def validateCard(message, hand, trump, newHand):
         
     return theCard
 
-# helper function 4: playing a card
-def playCard(selectedCard, trump, p, hands, cardsPlayed):
+
+def validate_move(selectedCard, trump, p, hands, cardsPlayed):
     # selectedCard must already be validated for hands[str(p)]
-    
-    def goAhead():
-        cardsPlayed.append(selectedCard)
-        hands[str(p)].remove(selectedCard)
-    
+
     if cardsPlayed == []:
-        goAhead()
+       return True
 
     else:
         if cardsPlayed[0] == getLowBower(trump):
@@ -251,18 +247,19 @@ def playCard(selectedCard, trump, p, hands, cardsPlayed):
 
         if selectedCard.suit != ledSuit:
             if selectedCard == getLowBower(trump) and ledSuit == trump:
-                goAhead()
+               return True
             else:
                 suitsInHand = {c.suit for c in hands[str(p)]}
                 if getLowBower(trump) in hands[str(p)]:
                     suitsInHand.add(trump)
                 if ledSuit in suitsInHand:
-                    selectedCard = validateCard("you must follow suit, please play a " + ledSuit[:-1] + ": ", hands[str(p)], trump, False)
-                    playCard(selectedCard, trump, p, hands, cardsPlayed)
+                    print "Follow suit!"
+                    return False
                 else:
-                    goAhead() 
+                    return True
         else:
-            goAhead()
+           return True
+
 
 # seeing the scores:
 #def getScore():
@@ -357,14 +354,19 @@ def play500():
         
         # play the tricks:
         for trick in range(10):
-            playOrder = [getPlayer(x) for x in range(leadPlayer, leadPlayer+4)]
+            playOrder = [str(getPlayer(x)) for x in range(leadPlayer, leadPlayer+4)]
             cardsPlayed = []
             for p in playOrder:
                 print "player", p, ": it's your turn. Here is your hand: "
-                for c in hands[str(p)]:
+                for c in hands[p]:
                     print c
-                selectedCard = validateCard("Which card would you like to play? ", hands[str(p)], high_bid.suit, None)
-                playCard(selectedCard, high_bid.suit, p, hands, cardsPlayed)
+                valid_move = False
+                while not valid_move:
+                    selectedCard = validateCard("Which card would you like to play? ", hands[p], high_bid.suit, None)
+                    valid_move = validate_move(selectedCard, high_bid.suit, p, hands, cardsPlayed)
+                cardsPlayed.append(selectedCard)
+                hands[p].remove(selectedCard)
+
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winningCard = max(contenders)
             winningPlayer = playOrder[cardsPlayed.index(winningCard)]
