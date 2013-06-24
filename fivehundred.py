@@ -330,7 +330,7 @@ def play500():
     score24 = 0
     tricks13 = 0
     tricks24 = 0
-        
+    
     # assign an initial dealer:
     dealer = 4
     
@@ -366,7 +366,7 @@ def play500():
             playOrder = [str(getPlayer(x)) for x in range(lead_player, lead_player+4)]
             cardsPlayed = []
             for p in playOrder:
-                print "player", p, ": it's your turn. Here is your hand: "
+                print "player "+p+": it's your turn. Here is your hand: "
                 for c in hands[p]:
                     print c
                 valid_move = False
