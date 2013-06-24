@@ -197,9 +197,6 @@ def pickUpKitty(highBid, hands):
 # helper function for choosing and playing cards:
 def validateCard(cardString, hand, trump, newHand):
     # hand is list of possible cards the card could come from
-    #if cardString == "score":
-    #    getScore()
-    #    theCard = validateCard(raw_input("enter card: "), hand, trump, newHand)
     
     if cardString == "joker":
         theCard = Card(suit=trump, number="joker", trump=True)
@@ -294,9 +291,11 @@ def end_game_message(score13, score24):
     print "thank you for playing!"    
 
 
+play500(True)
+
 #### PLAY GAME
 
-def play500():    
+def play500(testmodule):    
     print "welcome to python 500!"
     
     # keep track of each team's score:
@@ -331,7 +330,11 @@ def play500():
         hands = shuffleDeal(deck, handsize = 10, kittySize = 5)
         
         # bid:
-        highBid = getBids(dealer, hands)
+        if testmodule:
+            highBid = [Bid(8,'hearts'), 3]
+        else:
+            highBid = getBids(dealer, hands)
+        
         
         # make sure the bid was high enough:
         if highBid[0].number == 0 or highBid[0].number == 6:
@@ -356,6 +359,7 @@ def play500():
                     print c
                 selectedCardString = raw_input("Which card would you like to play? ")
                 selectedCard = validateCard(selectedCardString, hands[str(p)], highBid[0].suit, None)
+                
                 playCard(selectedCard, highBid[0].suit, p, hands, cardsPlayed)
             contenders = [x for x in cardsPlayed if x.suit==cardsPlayed[0].suit or x.trump]
             winningCard = max(contenders)
