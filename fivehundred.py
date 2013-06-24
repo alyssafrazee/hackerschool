@@ -119,10 +119,6 @@ def get_high_bid(dealer, hands):
 
 # helper function for bidding: checking whether a bid is valid
 def validateBid(theBid, currentBid):
-    
-    #if theBid == "score":
-    #    getScore()
-    #    return validateBid(raw_input("enter bid: "), currentBid)
 
     if theBid == 'pass':
         return Bid(number=0, suit='spades')
@@ -196,7 +192,6 @@ def pickUpKitty(high_bid, leadPlayer, hands):
 # helper function for choosing and playing cards:
 def validateCard(message, hand, trump, newHand):
     card = raw_input(message)
-    # hand is list of possible cards the card could come from
     
     card_values = ['4','5','6','7','8','9','10','J','Q','K','A']
     card_suits = ['spades','hearts','diamonds','clubs']
