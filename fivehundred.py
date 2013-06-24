@@ -196,9 +196,6 @@ def pickUpKitty(highBid, hands):
 # helper function for choosing and playing cards:
 def validateCard(cardString, hand, trump, newHand):
     # hand is list of possible cards the card could come from
-    #if cardString == "score":
-    #    getScore()
-    #    theCard = validateCard(raw_input("enter card: "), hand, trump, newHand)
     
     if cardString == "joker":
         theCard = Card(suit=trump, number="joker", trump=True)
